@@ -477,6 +477,7 @@ namespace THOR_T_Csharpe
             this.node10Box.Name = "node10Box";
             this.node10Box.Size = new System.Drawing.Size(100, 21);
             this.node10Box.TabIndex = 23;
+            this.node10Box.Text = "220";
             this.node10Box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label5
@@ -494,6 +495,7 @@ namespace THOR_T_Csharpe
             this.node9Box.Name = "node9Box";
             this.node9Box.Size = new System.Drawing.Size(100, 21);
             this.node9Box.TabIndex = 21;
+            this.node9Box.Text = "210";
             this.node9Box.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label13

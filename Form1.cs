@@ -24,7 +24,6 @@ namespace THOR_T_Csharpe
         public uint com;            //串口号
         public uint baudrate;       //波特率
 
-        public int move_mode = 0;              //运动方式相对还是绝对
         public int[] axis_list = new int[4];   //运动轴列表
 
         public int single_axis = 0;  //单轴轴号
@@ -37,13 +36,13 @@ namespace THOR_T_Csharpe
 
         public string Socket_IP = "127.0.0.1";
         public int Socket_Port = 50088;
-        public bool Socket_Listen = false;
 
         Socket socketwatch = null;
         Thread threadwatch = null;
         Thread threadPTS = null;
         Thread threadMainTest = null;
 
+        #region  系统加载，无需更改
         public Form1()
         {
             InitializeComponent();
@@ -56,7 +55,7 @@ namespace THOR_T_Csharpe
                 nodes[i] = 0;
             }
         }
-
+        #endregion
         #region 连接到控制器事件
         private void button1_Click(object sender, EventArgs e)  //连接到控制器
         {
@@ -119,9 +118,22 @@ namespace THOR_T_Csharpe
                     single_axis = Convert.ToInt32(axisnum.Text);
                     //获取当前轴的速度
                     single_speed[single_axis] = Convert.ToSingle(single_sp.Text);
-                    //获取需要测试的节点数
+                    //获取需要测试的节点数和每个节点的值
                     node_num = Convert.ToInt32(node_numBox.Text);
-                    
+                    nodes[0] = Convert.ToInt32(node1Box.Text);
+                    nodes[1] = Convert.ToInt32(node2Box.Text);
+                    nodes[2] = Convert.ToInt32(node3Box.Text);
+                    nodes[3] = Convert.ToInt32(node4Box.Text);
+                    nodes[4] = Convert.ToInt32(node5Box.Text);
+                    nodes[5] = Convert.ToInt32(node6Box.Text);
+                    nodes[6] = Convert.ToInt32(node7Box.Text);
+                    nodes[7] = Convert.ToInt32(node8Box.Text);
+                    nodes[8] = Convert.ToInt32(node9Box.Text);
+                    nodes[9] = Convert.ToInt32(node10Box.Text);
+                    motorRun();  //电机开始走动
+                    //主测试线程启动
+                    threadMainTest = new Thread(test);
+                    threadMainTest.IsBackground = true;
                 }
                 //若在测试中，则可以取消
                 else if (testButt.Text.Equals("测试中"))
@@ -207,13 +219,7 @@ namespace THOR_T_Csharpe
 
             if (g_handle != (IntPtr)0)
             {
-                //设置轴参数
-                zmcaux.ZAux_Direct_SetAtype(g_handle, single_axis, 1);
-                zmcaux.ZAux_Direct_SetUnits(g_handle, single_axis, 4000); //脉冲当量为4000
-                zmcaux.ZAux_Direct_SetSpeed(g_handle, single_axis, single_speed[single_axis]);  //1mm/s
-                zmcaux.ZAux_Direct_SetInvertStep(g_handle, single_axis, 1); //运动模式为脉冲+方向
-                zmcaux.ZAux_Direct_Single_Vmove(g_handle, single_axis, dir); //正向运动
-                addInfoString("速度:" + single_speed[single_axis] + "mm/s," + checkBox1.Text);
+                motorRun();
             }
             else
             {
@@ -354,10 +360,12 @@ namespace THOR_T_Csharpe
             {
                 //定义一个套接字用于监听客户端发来的消息，包含三个参数（IP4寻址协议，流式连接，Tcp协议）  
                 socketwatch = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                Socket_IP = SocketIpBox.Text;
+                Socket_Port = Convert.ToInt32(portBox.Text);
                 //服务端发送信息需要一个IP地址和端口号  
-                IPAddress address = IPAddress.Parse("127.0.0.1");
+                IPAddress address = IPAddress.Parse(Socket_IP);
                 //将IP地址和端口号绑定到网络节点point上  
-                IPEndPoint point = new IPEndPoint(address, 50088);
+                IPEndPoint point = new IPEndPoint(address, Socket_Port);
                 //此端口专门用来监听的  
 
                 //监听绑定的网络节点  
@@ -483,8 +491,7 @@ namespace THOR_T_Csharpe
         {
             while(true)
             {
-                addInfoString("haahah");
-                //Thread.Sleep(2000);
+                
                 threadMainTest.Abort();
                 threadMainTest = null;
                 GC.Collect();
@@ -492,6 +499,17 @@ namespace THOR_T_Csharpe
             }
         }
         #endregion
-
+        #region  电机运动
+        private void motorRun()
+        {
+            //设置轴参数
+            zmcaux.ZAux_Direct_SetAtype(g_handle, single_axis, 1);
+            zmcaux.ZAux_Direct_SetUnits(g_handle, single_axis, 4000); //脉冲当量为4000
+            zmcaux.ZAux_Direct_SetSpeed(g_handle, single_axis, single_speed[single_axis]);  //1mm/s
+            zmcaux.ZAux_Direct_SetInvertStep(g_handle, single_axis, 1); //运动模式为脉冲+方向
+            zmcaux.ZAux_Direct_Single_Vmove(g_handle, single_axis, dir); //正向运动
+            addInfoString("速度:" + single_speed[single_axis] + "mm/s," + checkBox1.Text);
+        }
+        #endregion
     }
 }
