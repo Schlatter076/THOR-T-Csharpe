@@ -81,7 +81,6 @@ namespace THOR_T_Csharpe
             this.node_numBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.single_sp = new System.Windows.Forms.TextBox();
             this.label17 = new System.Windows.Forms.Label();
@@ -91,6 +90,13 @@ namespace THOR_T_Csharpe
             this.label34 = new System.Windows.Forms.Label();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.datumButt = new System.Windows.Forms.Button();
+            this.datum_slow = new System.Windows.Forms.TextBox();
+            this.label39 = new System.Windows.Forms.Label();
+            this.datumsp = new System.Windows.Forms.TextBox();
+            this.label38 = new System.Windows.Forms.Label();
+            this.datum = new System.Windows.Forms.ComboBox();
+            this.label36 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox4.SuspendLayout();
@@ -662,7 +668,13 @@ namespace THOR_T_Csharpe
             // 
             // groupBox6
             // 
-            this.groupBox6.Controls.Add(this.richTextBox2);
+            this.groupBox6.Controls.Add(this.datumButt);
+            this.groupBox6.Controls.Add(this.datum_slow);
+            this.groupBox6.Controls.Add(this.label39);
+            this.groupBox6.Controls.Add(this.datumsp);
+            this.groupBox6.Controls.Add(this.label38);
+            this.groupBox6.Controls.Add(this.datum);
+            this.groupBox6.Controls.Add(this.label36);
             this.groupBox6.Controls.Add(this.checkBox1);
             this.groupBox6.Controls.Add(this.single_sp);
             this.groupBox6.Controls.Add(this.label17);
@@ -677,26 +689,16 @@ namespace THOR_T_Csharpe
             this.groupBox6.TabStop = false;
             this.groupBox6.Text = "单轴运动";
             // 
-            // richTextBox2
-            // 
-            this.richTextBox2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.richTextBox2.Font = new System.Drawing.Font("隶书", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.richTextBox2.ForeColor = System.Drawing.Color.Maroon;
-            this.richTextBox2.Location = new System.Drawing.Point(12, 243);
-            this.richTextBox2.Name = "richTextBox2";
-            this.richTextBox2.ReadOnly = true;
-            this.richTextBox2.Size = new System.Drawing.Size(247, 108);
-            this.richTextBox2.TabIndex = 36;
-            this.richTextBox2.Text = "**此处为调试版面\n**1.连接到控制器\n**2.设置轴号(0-X,1-Y,2-Z)\n**3.设置运动方向\n**4.默认速度1mm/s";
-            // 
             // checkBox1
             // 
             this.checkBox1.AutoSize = true;
+            this.checkBox1.Checked = true;
+            this.checkBox1.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1.Location = new System.Drawing.Point(13, 127);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(96, 16);
             this.checkBox1.TabIndex = 35;
-            this.checkBox1.Text = "运动方向：正";
+            this.checkBox1.Text = "运动方向：负";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
@@ -766,6 +768,73 @@ namespace THOR_T_Csharpe
             // 
             this.timer1.Interval = 100000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // datumButt
+            // 
+            this.datumButt.Location = new System.Drawing.Point(193, 213);
+            this.datumButt.Name = "datumButt";
+            this.datumButt.Size = new System.Drawing.Size(66, 28);
+            this.datumButt.TabIndex = 42;
+            this.datumButt.Text = "回零";
+            this.datumButt.UseVisualStyleBackColor = true;
+            this.datumButt.Click += new System.EventHandler(this.datumButt_Click);
+            // 
+            // datum_slow
+            // 
+            this.datum_slow.Location = new System.Drawing.Point(114, 260);
+            this.datum_slow.Name = "datum_slow";
+            this.datum_slow.Size = new System.Drawing.Size(52, 21);
+            this.datum_slow.TabIndex = 41;
+            this.datum_slow.Text = "1";
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Location = new System.Drawing.Point(10, 270);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(53, 12);
+            this.label39.TabIndex = 40;
+            this.label39.Text = "爬行速度";
+            // 
+            // datumsp
+            // 
+            this.datumsp.Location = new System.Drawing.Point(114, 213);
+            this.datumsp.Name = "datumsp";
+            this.datumsp.Size = new System.Drawing.Size(52, 21);
+            this.datumsp.TabIndex = 39;
+            this.datumsp.Text = "10";
+            // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Location = new System.Drawing.Point(10, 225);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(53, 12);
+            this.label38.TabIndex = 38;
+            this.label38.Text = "回零速度";
+            // 
+            // datum
+            // 
+            this.datum.FormattingEnabled = true;
+            this.datum.Items.AddRange(new object[] {
+            "3",
+            "4",
+            "8",
+            "9"});
+            this.datum.Location = new System.Drawing.Point(114, 172);
+            this.datum.Name = "datum";
+            this.datum.Size = new System.Drawing.Size(52, 20);
+            this.datum.TabIndex = 37;
+            this.datum.Text = "3";
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(10, 180);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(53, 12);
+            this.label36.TabIndex = 36;
+            this.label36.Text = "回零模式";
             // 
             // Form1
             // 
@@ -848,12 +917,18 @@ namespace THOR_T_Csharpe
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.RichTextBox richTextBox2;
         private System.Windows.Forms.Button listenButt;
         private System.Windows.Forms.TextBox portBox;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.TextBox SocketIpBox;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Button datumButt;
+        private System.Windows.Forms.TextBox datum_slow;
+        private System.Windows.Forms.Label label39;
+        private System.Windows.Forms.TextBox datumsp;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.ComboBox datum;
+        private System.Windows.Forms.Label label36;
     }
 }
 

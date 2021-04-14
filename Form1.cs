@@ -15,6 +15,7 @@ namespace THOR_T_Csharpe
 {
     public partial class Form1 : Form
     {
+        #region 全局变量及字段
         public IntPtr g_handle;
         public int aaa;             //用于调试时，查看返回值
         public string Adrr;        //连接的IP地址
@@ -28,19 +29,27 @@ namespace THOR_T_Csharpe
 
         public int single_axis = 0;  //单轴轴号
         public float[] single_speed = new float[4] { 1, 1, 1, 1 };  //单轴运动速度
-        public int dir = 1;             //运动方向
+        public int dir = -1;             //运动方向(默认负向==向上)
+
+        public int home_mode = 3;  //回零模式
+        public float home_speed = 10;  //回零速度
+        public float slow_speed = 1;  //回零爬行速度
 
         public int node_num = 0;  //待测试的节点总数
         public int[] nodes = new int[10];  //每一个节点的力度大小
+        public bool[] node_flags = new bool[10];  //到达每个节点的标志位
+        public int node_counter = 0;  //已到达的节点计数器
         public int node_offset = 5; //节点力度的浮动范围
+
 
         public string Socket_IP = "127.0.0.1";
         public int Socket_Port = 50088;
 
-        Socket socketwatch = null;
-        Thread threadwatch = null;
-        Thread threadPTS = null;
-        Thread threadMainTest = null;
+        private Socket socketwatch = null;
+        private Thread threadwatch = null;
+        private Thread threadPTS = null;
+        private Thread threadMainTest = null;
+        #endregion
 
         #region  系统加载，无需更改
         public Form1()
@@ -134,6 +143,7 @@ namespace THOR_T_Csharpe
                     //主测试线程启动
                     threadMainTest = new Thread(test);
                     threadMainTest.IsBackground = true;
+                    threadMainTest.Start();  //启动主测试流程
                 }
                 //若在测试中，则可以取消
                 else if (testButt.Text.Equals("测试中"))
@@ -143,6 +153,12 @@ namespace THOR_T_Csharpe
                     {
                         testButt.Text = "启动测试";
                         testButt.BackColor = Color.Snow;
+                        threadMainTest.Abort();
+                        threadMainTest = null;
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        motorGoHome(3);  //正向回零
+                        clearNodeFlags();
                         addInfoString("测试中断");
                     }
                 }
@@ -425,7 +441,7 @@ namespace THOR_T_Csharpe
                 int clientPort = (connection.RemoteEndPoint as IPEndPoint).Port;
 
                 //让客户显示"连接成功的"的信息  
-                string sendmsg = "连接服务端成功！\r\n" + "本地IP:" + clientIP + "，本地端口" + clientPort.ToString();
+                string sendmsg = "Success{" + "IP=" + clientIP + ",Port=" + clientPort.ToString() + "}\r\n";
                 byte[] arrSendMsg = Encoding.UTF8.GetBytes(sendmsg);
                 connection.Send(arrSendMsg);
 
@@ -473,7 +489,7 @@ namespace THOR_T_Csharpe
                     //将发送的字符串信息附加到文本框txtMsg上     
                     addInfoString("客户端:" + socketServer.RemoteEndPoint + "\r\n" + strSRecMsg);
 
-                    socketServer.Send(Encoding.UTF8.GetBytes("测试server 是否可以发送数据给client "));
+                    socketServer.Send(Encoding.UTF8.GetBytes("ACK"));
                 }
                 catch (Exception ex)
                 {
@@ -491,11 +507,17 @@ namespace THOR_T_Csharpe
         {
             while(true)
             {
-                
-                threadMainTest.Abort();
-                threadMainTest = null;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                if(node_counter < node_num)
+                {
+
+                }
+                else
+                {
+                    threadMainTest.Abort();
+                    threadMainTest = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
             }
         }
         #endregion
@@ -509,6 +531,42 @@ namespace THOR_T_Csharpe
             zmcaux.ZAux_Direct_SetInvertStep(g_handle, single_axis, 1); //运动模式为脉冲+方向
             zmcaux.ZAux_Direct_Single_Vmove(g_handle, single_axis, dir); //正向运动
             addInfoString("速度:" + single_speed[single_axis] + "mm/s," + checkBox1.Text);
+        }
+        #endregion
+        #region 电机寻找零位
+        private void motorGoHome(int mode)
+        {
+            single_axis = Convert.ToInt32(axisnum.Text);
+            home_speed = Convert.ToSingle(datumsp.Text);
+            slow_speed = Convert.ToSingle(datum_slow.Text);
+
+            zmcaux.ZAux_Direct_SetSpeed(g_handle, single_axis, home_speed);         //设置速度
+            zmcaux.ZAux_Direct_SetCreep(g_handle, single_axis, slow_speed);         //2次回零反找速度
+            zmcaux.ZAux_Direct_Single_Datum(g_handle, single_axis, mode);       //回零
+        }
+        #endregion
+        #region  单轴回零
+        private void datumButt_Click(object sender, EventArgs e)
+        {
+            if (g_handle != (IntPtr)0)
+            {
+                home_mode = Convert.ToInt32(datum.Text);
+                motorGoHome(home_mode);
+            }
+            else
+            {
+                addInfoString("请先连接到控制器!");
+            }
+        }
+        #endregion
+        #region  清除节点标志位
+        private void clearNodeFlags()
+        {
+            node_counter = 0;
+            for(int i = 0; i < 10; i++)
+            {
+                node_flags[i] = false;
+            }
         }
         #endregion
     }
