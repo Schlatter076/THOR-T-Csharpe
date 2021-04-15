@@ -40,7 +40,9 @@ namespace THOR_T_Csharpe
         public bool[] node_flags = new bool[10];  //到达每个节点的标志位
         public int node_counter = 0;  //已到达的节点计数器
         public int node_offset = 5; //节点力度的浮动范围
-
+        
+        public byte[] force_bytes = new byte[4]; //压力的十六进制表示数组
+        public float force_f = 0.0f;   //压力的浮点数表示
 
         public string Socket_IP = "127.0.0.1";
         public int Socket_Port = 50088;
@@ -225,6 +227,18 @@ namespace THOR_T_Csharpe
         private void button1_Click_1(object sender, EventArgs e)
         {
             richTextBox1.Clear();
+           
+            /*byte[] bytes = new byte[4] {0x9A, 0x72, 0x3B, 0x3E};
+            float f = BitConverter.ToSingle(bytes, 0);//从第0个字节开始转换
+            addInfoString(string.Format("{0:F8}", f));
+            byte[] f_bs = BitConverter.GetBytes(f);
+            string s = "";
+            for(int i = 0; i < 4; i++)
+            {
+                s += string.Format("{0:X00}", f_bs[i]);
+                s += " ";
+            }
+            addInfoString(s);*/
         }
         #endregion
         #region 单轴运动
